@@ -14,8 +14,6 @@ private let reuseIdentifier = "Cell"
 class CollectionViewController: UICollectionViewController {
     
     
-    
-    
     var memes: [Meme] {
         return (UIApplication.sharedApplication().delegate as! AppDelegate).memes
     }

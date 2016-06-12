@@ -17,13 +17,14 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     @IBOutlet weak var bottomText: UITextField!
     @IBOutlet weak var bottomToolbar: UIToolbar!
     @IBOutlet weak var shareButton: UIBarButtonItem!
-    @IBOutlet var topNavBar: UINavigationBar!
+    @IBOutlet weak var navBar: UINavigationBar!
+ 
+    
     
     //MARK: VARIABLES
     var keyboardHidden = true
-    var memes: [Meme] {
-        return (UIApplication.sharedApplication().delegate as! AppDelegate).memes
-    }
+    var meme: Meme!
+    
     
     //MARK: VIEW FUNCTIONS
     override func viewDidLoad() {
@@ -35,17 +36,13 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         bottomText.text = "BOTTOM"
         
         shareButton.enabled = false
-        
-        
     }
     
     override func viewWillAppear(animated: Bool) {
         cameraButton.enabled = UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.Camera)
         
-        //subscribeToKeyboardNotifications()
-        
-        
-    }
+        }
+    
     
     override func viewWillDisappear(animated: Bool) {
         unsubscribeFromKeyboardNotifications()
@@ -55,6 +52,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     // MARK: UIIMAGEPICKERCONTROLLER
     func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
         if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
+            imagePickerView.contentMode = .ScaleAspectFit
             imagePickerView.image = image
         }
         dismissViewControllerAnimated(true, completion: nil)
@@ -71,7 +69,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         let memeTextAttributes = [
             NSStrokeColorAttributeName : UIColor.blackColor(),
             NSForegroundColorAttributeName : UIColor.whiteColor(),
-            NSFontAttributeName : UIFont(name: "HelveticaNeue-CondensedBlack", size: 35)!,
+            NSFontAttributeName : UIFont(name: "impact", size: 35)!,
             NSStrokeWidthAttributeName : -3.0
         ]
         textField.delegate = self
@@ -151,15 +149,15 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     
     func save() {
         
-        let meme = Meme(topText: topText.text!, bottomText: bottomText.text!, image: imagePickerView.image, memeImage: generateMemedImage())
+        self.meme = Meme(topText: topText.text!, bottomText: bottomText.text!, image: imagePickerView.image, memeImage: generateMemedImage())
         
         (UIApplication.sharedApplication().delegate as! AppDelegate).memes.append(meme)
-
+        
         
     }
     
     func hideToolBars(flag:Bool){
-        topNavBar.hidden = flag
+        navBar.hidden = flag
         bottomToolbar.hidden = flag
     }
     
@@ -189,18 +187,15 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
             if ok{
                 self.save()
                 self.dismissViewControllerAnimated(true, completion: nil)
-            }else{
-                controller.dismissViewControllerAnimated(true, completion: nil )
             }
         }
         presentViewController(controller, animated: true, completion: nil)
     }
     
-    @IBAction func Cancel(sender: UIBarButtonItem) {
+    @IBAction func cancelMeme(sender: UIBarButtonItem) {
         self.dismissViewControllerAnimated(true, completion: nil)
+        
     }
-    
-    
     
     
 }
