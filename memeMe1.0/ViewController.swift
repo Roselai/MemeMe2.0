@@ -8,6 +8,10 @@
 
 import UIKit
 
+protocol viewControllerDelegate{
+    func myVCDidFinish(controller:ViewController, editedMeme: Meme)
+}
+
 class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITextFieldDelegate {
     
     //MARK: OUTLETS
@@ -18,13 +22,14 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     @IBOutlet weak var bottomToolbar: UIToolbar!
     @IBOutlet weak var shareButton: UIBarButtonItem!
     @IBOutlet weak var navBar: UINavigationBar!
- 
-    
+    @IBOutlet weak var saveMemeButton: UIBarButtonItem!
+
     
     //MARK: VARIABLES
     var keyboardHidden = true
     var meme: Meme!
-    
+    var memeIndex: Int?
+    var delegate:viewControllerDelegate? = nil
     
     //MARK: VIEW FUNCTIONS
     override func viewDidLoad() {
@@ -36,10 +41,27 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         bottomText.text = "BOTTOM"
         
         shareButton.enabled = false
+        saveMemeButton.enabled = false
     }
     
     override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        
         cameraButton.enabled = UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.Camera)
+        
+        
+        if (meme != nil)  {
+            shareButton.enabled = true
+            saveMemeButton.enabled = true
+            
+            imagePickerView.image = meme.image
+            topText.text = meme.topText
+            bottomText.text = meme.bottomText
+        }
+        
+        else {
+            return
+        }
         
         }
     
@@ -57,6 +79,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         }
         dismissViewControllerAnimated(true, completion: nil)
         shareButton.enabled = true
+        saveMemeButton.enabled = true
     }
     
     func imagePickerControllerDidCancel(picker: UIImagePickerController) {
@@ -143,17 +166,25 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         UIGraphicsEndImageContext()
         
         hideToolBars(false)
-        
+
         return memedImage
     }
     
     func save() {
         
-        self.meme = Meme(topText: topText.text!, bottomText: bottomText.text!, image: imagePickerView.image, memeImage: generateMemedImage())
+        meme = Meme(topText: topText.text!, bottomText: bottomText.text!, image: imagePickerView.image, memeImage: generateMemedImage())
         
-        (UIApplication.sharedApplication().delegate as! AppDelegate).memes.append(meme)
-        
-        
+        if (delegate != nil) {
+            
+            delegate!.myVCDidFinish(self, editedMeme: meme)
+            
+            (UIApplication.sharedApplication().delegate as! AppDelegate).memes.removeAtIndex(memeIndex!)
+            (UIApplication.sharedApplication().delegate as! AppDelegate).memes.insert(meme, atIndex: memeIndex!)
+        }
+        else {
+
+            (UIApplication.sharedApplication().delegate as! AppDelegate).memes.append(meme)
+        }
     }
     
     func hideToolBars(flag:Bool){
@@ -196,6 +227,13 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         self.dismissViewControllerAnimated(true, completion: nil)
         
     }
+    
+    @IBAction func saveMemeButton(sender: UIBarButtonItem) {
+        save()
+        self.dismissViewControllerAnimated(true, completion: {
+        })
+    }
+    
     
     
 }

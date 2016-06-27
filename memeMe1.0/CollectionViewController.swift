@@ -18,6 +18,14 @@ class CollectionViewController: UICollectionViewController {
         return (UIApplication.sharedApplication().delegate as! AppDelegate).memes
     }
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        let navBarHeight = navigationController!.navigationBar.frame.size.height
+        let statusBarHeight = UIApplication.sharedApplication().statusBarFrame.size.height
+        collectionView!.contentInset = UIEdgeInsets(top: (navBarHeight + statusBarHeight), left: 0,bottom: 0,right: 0)
+    }
+    
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)

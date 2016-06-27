@@ -19,13 +19,10 @@ class MemeTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let navBarHeight = navigationController!.navigationBar.frame.size.height
+        let statusBarHeight = UIApplication.sharedApplication().statusBarFrame.size.height
+        tableView.contentInset = UIEdgeInsets(top: (navBarHeight + statusBarHeight), left: 0,bottom: 0,right: 0)
         
-        //Get the height of the status bar
-        let statusBarHeight = UIApplication.sharedApplication().statusBarFrame.height
-        
-        let insets = UIEdgeInsets(top: statusBarHeight, left: 0, bottom: 0, right: 0)
-        tableView.contentInset = insets
-        tableView.scrollIndicatorInsets = insets
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -67,12 +64,15 @@ class MemeTableViewController: UITableViewController {
         if segue.identifier == "ShowMeme" {
             if let row = tableView.indexPathForSelectedRow?.row {
                 let selectedMeme = memes[row]
+                let memeIndex = row
                 let detailViewController = segue.destinationViewController as! MemeDetailViewController
                 detailViewController.meme = selectedMeme
+                detailViewController.memeIndex = memeIndex
             }
         }
         
     }
+    
 }
 
 
