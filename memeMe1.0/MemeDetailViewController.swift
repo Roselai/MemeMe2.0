@@ -9,7 +9,7 @@
 import UIKit
 
 
-class MemeDetailViewController: UIViewController, viewControllerDelegate {
+class MemeDetailViewController: UIViewController, MemeEditorViewControllerDelegate {
     
     @IBOutlet var imageView: UIImageView!
     
@@ -20,35 +20,35 @@ class MemeDetailViewController: UIViewController, viewControllerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
+        view.addSubview(imageView)
     }
     
     
-    
+
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
         let image = meme.memeImage
         imageView.image = image
-        view.addSubview(imageView)
+        
         
     }
     
-  
+    
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "EditMeme" {
-                let memeEditor = segue.destinationViewController as! ViewController
-                memeEditor.meme = meme
-                memeEditor.memeIndex = memeIndex
-                memeEditor.delegate = self
-            }
+            let memeEditor = segue.destinationViewController as! MemeEditorViewController
+            memeEditor.meme = meme
+            memeEditor.memeIndex = memeIndex
+            memeEditor.delegate = self
         }
+    }
     
-    func myVCDidFinish(controller: ViewController, editedMeme: Meme) {
+    func myVCDidFinish(controller: MemeEditorViewController, editedMeme: Meme) {
         meme = editedMeme
-       controller.navigationController?.popViewControllerAnimated(true)
+        controller.navigationController?.popViewControllerAnimated(true)
         
     }
-
+    
 }

@@ -1,18 +1,18 @@
 //
-//  ViewController.swift
-//  memeMe1.0
+//  MemeEditorViewController.swift
+//  memeMe2.0
 //
-//  Created by Shukti Shaikh on 5/11/16.
+//  Created by Shukti Shaikh on 6/27/16.
 //  Copyright © 2016 Shukti Azad. All rights reserved.
 //
 
 import UIKit
 
-protocol viewControllerDelegate{
-    func myVCDidFinish(controller:ViewController, editedMeme: Meme)
+protocol MemeEditorViewControllerDelegate{
+    func myVCDidFinish(controller:MemeEditorViewController, editedMeme: Meme)
 }
 
-class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITextFieldDelegate {
+class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITextFieldDelegate {
     
     //MARK: OUTLETS
     @IBOutlet weak var imagePickerView: UIImageView!
@@ -23,13 +23,14 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     @IBOutlet weak var shareButton: UIBarButtonItem!
     @IBOutlet weak var navBar: UINavigationBar!
     @IBOutlet weak var saveMemeButton: UIBarButtonItem!
-
+    @IBOutlet weak var memeSavedLabel: UILabel!
+    
     
     //MARK: VARIABLES
     var keyboardHidden = true
     var meme: Meme!
     var memeIndex: Int?
-    var delegate:viewControllerDelegate? = nil
+    var delegate:MemeEditorViewControllerDelegate? = nil
     
     //MARK: VIEW FUNCTIONS
     override func viewDidLoad() {
@@ -58,12 +59,12 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
             topText.text = meme.topText
             bottomText.text = meme.bottomText
         }
-        
+            
         else {
             return
         }
         
-        }
+    }
     
     
     override func viewWillDisappear(animated: Bool) {
@@ -101,6 +102,11 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     }
     
     func textFieldDidBeginEditing(textField: UITextField) {
+        
+        if imagePickerView.image != nil {
+            saveMemeButton.enabled = true
+        }
+        
         if textField.text == "TOP" || textField.text == "BOTTOM"{
             if textField .isEqual(bottomText) {
                 subscribeToKeyboardNotifications()
@@ -116,17 +122,17 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     
     //MARK: KEYBOARD FUNCTIONS
     func keyboardWillShow(notification: NSNotification) {
-        if(keyboardHidden){
-            if self.view.frame.origin.y == 0.0{
-                self.view.frame.origin.y -= getKeyboardHeight(notification)
+        if bottomText.isFirstResponder(){
+            if view.frame.origin.y == 0.0 {
+                view.frame.origin.y = getKeyboardHeight(notification) * (-1)
                 keyboardHidden = false
             }
         }
     }
     
     func keyboardWillHide(notification: NSNotification) {
-        if(!keyboardHidden){
-            self.view.frame.origin.y += getKeyboardHeight(notification)
+        if bottomText.isFirstResponder() {
+            view.frame.origin.y = 0
             keyboardHidden = true
         }
     }
@@ -166,7 +172,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         UIGraphicsEndImageContext()
         
         hideToolBars(false)
-
+        
         return memedImage
     }
     
@@ -182,9 +188,10 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
             (UIApplication.sharedApplication().delegate as! AppDelegate).memes.insert(meme, atIndex: memeIndex!)
         }
         else {
-
+            
             (UIApplication.sharedApplication().delegate as! AppDelegate).memes.append(meme)
         }
+        
     }
     
     func hideToolBars(flag:Bool){
@@ -230,8 +237,15 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     
     @IBAction func saveMemeButton(sender: UIBarButtonItem) {
         save()
-        self.dismissViewControllerAnimated(true, completion: {
-        })
+        saveMemeButton.enabled = false
+        
+        memeSavedLabel.hidden = false
+        
+        UIView.animateWithDuration(5.0, delay: 0, options: UIViewAnimationOptions.CurveEaseOut, animations: {
+            self.memeSavedLabel.alpha = 0
+            }, completion: nil)
+        
+        
     }
     
     
